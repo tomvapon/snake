@@ -6,59 +6,60 @@ there are four possible movements (L, R, U, D). All options are
 explore and invalid solutions are discard.
 """
 
-import logic.validators as lv
-from logic.validators import is_valid_movement
-from logic.snake_utils import get_new_head_from_movement
+
+import sys
+import configparser
+from logic.validators import guarantee_constraints
+from logic.algorithm import explore_paths
 
 
-# Constants
-MOVEMENTS = ('L', 'U', 'D', 'R')
-
-# Global solution (empty when instance)
-solution = []
-
-
-# Recursive function for solving the problem --> backtracking strategy
-def explore_paths(board, snake, depth, current_solution):
+def load_input_file():
     """
-    This functions implements the recursive logic. For each configuration (snake/board), the four
-    different movements is explored in order to reach a new valid solution or not.
+    This function load an input file which contains the board dimensions, the snake and the depth.
+    This simplifies the problem of manual console input and let check the three acceptance tests.
 
-    :param board: A 2D list for board dimensions
-    :param snake: A 2D list of two-length arrays for snake dimensions
-    :param depth: path depth
-    :param current_solution: individual solution for the iteration
-    :return:
+    :return: board (list), snake (list of lists), depth (int)
     """
 
-    # Check if the current solution is already a full solution
-    if len(current_solution) == depth:
-        # Add the current solution to the global solution vector
-        solution.append(current_solution)
-    else:
-        # We explore the four possible movements
-        for movement in MOVEMENTS:
-            # Check if the movement is valid
-            if is_valid_movement(snake, board, movement):
-                # If it is valid, recursion is applied.
-                # The new snake is calculated adding the head and cutting the tail
-                new_snake = [get_new_head_from_movement(snake[0], movement)] + snake[:-1]
-                new_current_solution = current_solution + [movement]
-                explore_paths(board, new_snake, depth, new_current_solution)
+    # Load config parser
+    config = configparser.ConfigParser()
+
+    # Read first argument (data file)
+    config.read(sys.argv[1])
+
+    # Parse the inputs from string to its type
+    # Board (str --> list)
+    board_string = config['input']['board']
+    input_board = [int(element) for element in board_string.split(',')]
+
+    # Snake (str --> list of lists)
+    snake_string = config['input']['snake']
+    input_snake = [[int(el.split(',')[0]), int(el.split(',')[1])] for el in snake_string.split(';')]
+
+    # Depth (str --> int)
+    input_depth = int(config['input']['depth'])
+
+    return input_board, input_snake, input_depth
 
 
 if __name__ == '__main__':
-    # Example input
-    board = [4, 3]
-    snake = [[2, 2], [3, 2], [3, 1], [3, 0], [2, 0], [1, 0], [0, 0]]
-    depth = 3
+    # Load the input from the files
+    board, snake, depth = load_input_file()
 
-    run, message = lv.guarantee_constraints(board, snake, depth)
+    # Execute the guarantee of input
+    run, message = guarantee_constraints(board, snake, depth)
+
+    # Instantiate composed solution (final one)
+    composed_solution = []
 
     if run:
         print("Executing algorithm...")
         # Execute the first iteration with the current solution empty and the initial configuration
-        explore_paths(board, snake, depth, [])
-        print(len(solution))
+        explore_paths(board, snake, depth, [], composed_solution)
+
+        # The output is the length of the composed solution
+        print(len(composed_solution))
     else:
+        # Print error message in case input not guaranteed
         print(message)
+

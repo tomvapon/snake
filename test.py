@@ -4,6 +4,7 @@ In this file, the unit testing is to be implemented for validator and utils func
 
 import unittest
 import logic.validators as lv
+import logic.snake_utils as ls
 
 
 class TestValidators(unittest.TestCase):
@@ -39,6 +40,30 @@ class TestValidators(unittest.TestCase):
         # Assert false for outbounds snake
         invalid_snake = [[2, 2], [3, 2], [4, 1], [3, 0], [2, 0]]
         self.assertFalse(lv.board_snake_guarantee(self.board, invalid_snake))
+
+    def test_is_valid_snake_head(self):
+        # Assert true for the board
+        head = [3, 2]
+        bad_head = [2, 4]
+        self.assertTrue(lv.is_valid_snake_head(head, self.board))
+        self.assertFalse(lv.is_valid_snake_head(bad_head, self.board))
+
+    def test_is_collapse_snake(self):
+        # Assert true with initial snake
+        self.assertFalse(lv.is_collapse_snake(self.snake))
+
+        # Collapse with invalid movement, for example 'R'
+        new_head = ls.get_new_head_from_movement(self.snake[0], 'R')
+        self.assertTrue(lv.is_collapse_snake([new_head] + self.snake[:-1]))
+
+    def test_is_valid_movement(self):
+        # Assert true for up or left
+        self.assertTrue(lv.is_valid_movement(self.snake, self.board, 'U'))
+        self.assertTrue(lv.is_valid_movement(self.snake, self.board, 'L'))
+
+        # Assert false for down or right
+        self.assertFalse(lv.is_valid_movement(self.snake, self.board, 'D'))
+        self.assertFalse(lv.is_valid_movement(self.snake, self.board, 'R'))
 
 
 # Main function to run the tests

@@ -41,6 +41,42 @@ def board_snake_guarantee(board, snake):
     return all([0 <= snake_piece[i] < board[i] for i in range(0, 2) for snake_piece in snake])
 
 
+def depth_guarantee(depth):
+    """
+    Guarantee the depth is between 1 and 20 (included)
+
+    :param depth: path depth
+    :return: Boolean, True if depth is satisfied
+    """
+
+    return 1 <= depth <= 20
+
+
+def guarantee_constraints(board, snake, depth):
+    """
+    This function checks the board, snake, board-snake and depth constraints.
+
+    :param board: A 2D list for board dimensions
+    :param snake: A 2D list of two-length arrays for snake dimensions
+    :param depth: path depth
+    :return: (Boolean, text): True if all constraints are fulfil
+    """
+
+    if not board_guarantee(board):
+        return False, "Board {} does not satisfy constraints.".format(board)
+
+    if not snake_guarantee(snake):
+        return False, "Snake {} satisfies constraints.".format(snake)
+
+    if not board_snake_guarantee(board, snake):
+        return False, "Snake outbounds board."
+
+    if not depth_guarantee(depth):
+        return False, "Depth: {} is out of bounds.".format(depth)
+
+    return True, "All constraints are satisfied!"
+
+
 # Validate the snake movement
 def is_valid_snake_head(head, board):
     """

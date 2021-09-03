@@ -41,6 +41,15 @@ class TestValidators(unittest.TestCase):
         invalid_snake = [[2, 2], [3, 2], [4, 1], [3, 0], [2, 0]]
         self.assertFalse(lv.board_snake_guarantee(self.board, invalid_snake))
 
+    def test_depth_guarantee(self):
+        # Assert setUp depth is correct
+        self.assertTrue(lv.depth_guarantee(self.depth))
+
+        # Negative depth and outbound depth
+        invalid_depths = [-3, 25]
+        for invalid_depth in invalid_depths:
+            self.assertFalse(lv.depth_guarantee(invalid_depth))
+
     def test_is_valid_snake_head(self):
         # Assert true for the board
         head = [3, 2]
